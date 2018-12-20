@@ -13,7 +13,15 @@ import {
 } from './redux/reducers'
 
 const enhance = connect(
-  state => pick(state, ['board', 'initial', 'isValid', 'time']),
+  state =>
+    pick(state, [
+      'board',
+      'initial',
+      'isValid',
+      'time',
+      'boardLoading',
+      'isError'
+    ]),
   {
     handleClick: toggleCell,
     handleValidate: validateBoard,
@@ -39,19 +47,27 @@ class App extends Component {
   }
 
   render() {
-    const { board, initial, isValid, time } = this.props
+    const { board, initial, isValid, time, boardLoading, isError } = this.props
     return (
       <div className="App">
         <div className="board">
-          {board.map((row, rowIndex) =>
-            row.map((cell, cellIndex) => (
-              <Cell
-                number={cell}
-                key={`${rowIndex} - ${cellIndex}`}
-                isInitial={initial[rowIndex][cellIndex]}
-                handleClick={() => this.props.handleClick(rowIndex, cellIndex)}
-              />
-            ))
+          {isError ? (
+            <p>Error Load Board</p>
+          ) : boardLoading ? (
+            <p>Loading</p>
+          ) : (
+            board.map((row, rowIndex) =>
+              row.map((cell, cellIndex) => (
+                <Cell
+                  number={cell}
+                  key={`${rowIndex} - ${cellIndex}`}
+                  isInitial={initial[rowIndex][cellIndex]}
+                  handleClick={() =>
+                    this.props.handleClick(rowIndex, cellIndex)
+                  }
+                />
+              ))
+            )
           )}
         </div>
         <p>Time: {time} seconds</p>

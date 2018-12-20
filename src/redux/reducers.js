@@ -4,21 +4,34 @@ import validate from '../utils/vallidate'
 
 const initialState = {
   board: [],
+  boardLoading: true,
   initial: [],
   isValid: false,
+  isError: false,
   time: 0
 }
 
 export default (state = initialState, action) => {
   switch (action.type) {
+    case 'LOAD_BOARD_PENDING':
+      return {
+        ...state,
+        boardLoading: true
+      }
     case 'LOAD_BOARD_FULFILLED': {
       const { data } = action.payload
       return {
         ...state,
         board: data.board,
-        initial: data.initial
+        initial: data.initial,
+        boardLoading: false
       }
     }
+    case 'LOAD_BOARD_REJECTED':
+      return {
+        ...state,
+        isError: true
+      }
     case 'TOGGLE_CELL':
       return {
         ...state,
