@@ -1,19 +1,25 @@
 import React, { Component } from 'react'
-import set from 'lodash/set'
+import { connect } from 'react-redux'
+
 import './App.css'
 
 import Cell from './components/Cell'
 import validate from './utils/vallidate'
+import { toggleCell } from './redux/reducers'
+
+const enhance = connect(
+  state => ({
+    board: state.board,
+    initial: state.initial
+  }),
+  dispatch => ({
+    handleClick: (rowIndex, cellIndex) =>
+      dispatch(toggleCell(rowIndex, cellIndex))
+  })
+)
 
 class App extends Component {
   state = {
-    board: [[1, 2, 3, 4], [3, 4, 0, 0], [2, 0, 4, 0], [4, 0, 0, 2]],
-    initial: [
-      [true, true, true, true],
-      [true, true, false, false],
-      [true, false, true, false],
-      [true, false, false, true]
-    ],
     time: 0
   }
 
@@ -29,30 +35,19 @@ class App extends Component {
     clearInterval(this.timer)
   }
 
-  handleClick = (rowIndex, cellIndex) => {
-    this.setState(state => ({
-      board: set(
-        state.board,
-        `${rowIndex}.${cellIndex}`,
-        (state.board[rowIndex][cellIndex] + 1) % 5
-      )
-    }))
-  }
-
   handleValidate = () => {
-    this.setState(state => {
-      const isValid = validate(state.board)
-      if (isValid) {
-        clearInterval(this.timer)
-      }
-      return {
-        text: isValid ? 'Board is valid!' : 'Board is invalid!'
-      }
+    const isValid = validate(this.props.board)
+    if (isValid) {
+      clearInterval(this.timer)
+    }
+    this.setState({
+      text: isValid ? 'Board is valid!' : 'Board is invalid!'
     })
   }
 
   render() {
-    const { board, initial, text, time } = this.state
+    const { board, initial } = this.props
+    const { text, time } = this.state
     return (
       <div className="App">
         <div className="board">
@@ -62,7 +57,7 @@ class App extends Component {
                 number={cell}
                 key={`${rowIndex} - ${cellIndex}`}
                 isInitial={initial[rowIndex][cellIndex]}
-                handleClick={() => this.handleClick(rowIndex, cellIndex)}
+                handleClick={() => this.props.handleClick(rowIndex, cellIndex)}
               />
             ))
           )}
@@ -75,4 +70,4 @@ class App extends Component {
   }
 }
 
-export default App
+export default enhance(App)
