@@ -13,7 +13,20 @@ class App extends Component {
       [true, true, false, false],
       [true, false, true, false],
       [true, false, false, true]
-    ]
+    ],
+    time: 0
+  }
+
+  componentDidMount() {
+    this.timer = setInterval(() => {
+      this.setState(state => ({
+        time: state.time + 1
+      }))
+    }, 1000)
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timer)
   }
 
   handleClick = (rowIndex, cellIndex) => {
@@ -27,13 +40,19 @@ class App extends Component {
   }
 
   handleValidate = () => {
-    this.setState(state => ({
-      text: validate(state.board) ? 'Board is valid!' : 'Board is invalid!'
-    }))
+    this.setState(state => {
+      const isValid = validate(state.board)
+      if (isValid) {
+        clearInterval(this.timer)
+      }
+      return {
+        text: isValid ? 'Board is valid!' : 'Board is invalid!'
+      }
+    })
   }
 
   render() {
-    const { board, initial, text } = this.state
+    const { board, initial, text, time } = this.state
     return (
       <div className="App">
         <div className="board">
@@ -48,7 +67,8 @@ class App extends Component {
             ))
           )}
         </div>
-        <p>{text}</p>
+        <p>Time: {time} seconds</p>
+        {text && <p>{text}</p>}
         <button onClick={this.handleValidate}>Validate</button>
       </div>
     )
