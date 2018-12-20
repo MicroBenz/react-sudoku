@@ -3,6 +3,7 @@ import set from 'lodash/set'
 import './App.css'
 
 import Cell from './components/Cell'
+import validate from './utils/vallidate'
 
 class App extends Component {
   state = {
@@ -25,8 +26,14 @@ class App extends Component {
     }))
   }
 
+  handleValidate = () => {
+    this.setState(state => ({
+      text: validate(state.board) ? 'Board is valid!' : 'Board is invalid!'
+    }))
+  }
+
   render() {
-    const { board, initial } = this.state
+    const { board, initial, text } = this.state
     return (
       <div className="App">
         <div className="board">
@@ -41,6 +48,8 @@ class App extends Component {
             ))
           )}
         </div>
+        <p>{text}</p>
+        <button onClick={this.handleValidate}>Validate</button>
       </div>
     )
   }
