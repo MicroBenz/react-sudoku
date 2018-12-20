@@ -5,19 +5,26 @@ import pick from 'lodash/pick'
 import './App.css'
 
 import Cell from './components/Cell'
-import { toggleCell, validateBoard, setTimer } from './redux/reducers'
+import {
+  toggleCell,
+  validateBoard,
+  setTimer,
+  loadBoard
+} from './redux/reducers'
 
 const enhance = connect(
   state => pick(state, ['board', 'initial', 'isValid', 'time']),
   {
     handleClick: toggleCell,
     handleValidate: validateBoard,
-    setTimer
+    setTimer,
+    loadBoard
   }
 )
 
 class App extends Component {
   componentDidMount() {
+    this.props.loadBoard()
     this.timer = setInterval(() => {
       if (this.props.isValid) {
         clearInterval(this.timer)

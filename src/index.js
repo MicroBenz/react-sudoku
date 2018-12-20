@@ -1,23 +1,19 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import { createStore, compose } from 'redux'
+import { createStore, compose, applyMiddleware } from 'redux'
+import promiseMiddleware from 'redux-promise-middleware'
 
 import './index.css'
 import App from './App'
 import reducers from './redux/reducers'
 import * as serviceWorker from './serviceWorker'
 
-const composeEnhancers =
-  typeof window === 'object' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-    ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
-        // Specify extension’s options like name, actionsBlacklist, actionsCreators, serialize...
-      })
-    : compose
-
-const enhancer = composeEnhancers()
-
-const store = createStore(reducers, enhancer)
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+const store = createStore(
+  reducers,
+  composeEnhancers(applyMiddleware(promiseMiddleware()))
+)
 
 ReactDOM.render(
   <Provider store={store}>

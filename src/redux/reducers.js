@@ -1,20 +1,24 @@
+import axios from 'axios'
 import set from 'lodash/set'
 import validate from '../utils/vallidate'
 
 const initialState = {
-  board: [[1, 2, 3, 4], [3, 4, 0, 0], [2, 0, 4, 0], [4, 0, 0, 2]],
-  initial: [
-    [true, true, true, true],
-    [true, true, false, false],
-    [true, false, true, false],
-    [true, false, false, true]
-  ],
+  board: [],
+  initial: [],
   isValid: false,
   time: 0
 }
 
 export default (state = initialState, action) => {
   switch (action.type) {
+    case 'LOAD_BOARD_FULFILLED': {
+      const { data } = action.payload
+      return {
+        ...state,
+        board: data.board,
+        initial: data.initial
+      }
+    }
     case 'TOGGLE_CELL':
       return {
         ...state,
@@ -43,6 +47,11 @@ export default (state = initialState, action) => {
       return state
   }
 }
+
+export const loadBoard = () => ({
+  type: 'LOAD_BOARD',
+  payload: axios.get('http://www.mocky.io/v2/5c1b2f393300005f007fd622')
+})
 
 export const toggleCell = (rowIndex, cellIndex) => ({
   type: 'TOGGLE_CELL',
