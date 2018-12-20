@@ -1,33 +1,29 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import pick from 'lodash/pick'
 
 import './App.css'
 
 import Cell from './components/Cell'
-import validate from './utils/vallidate'
-import { toggleCell } from './redux/reducers'
+import { toggleCell, validateBoard, setTimer } from './redux/reducers'
 
 const enhance = connect(
-  state => ({
-    board: state.board,
-    initial: state.initial
-  }),
-  dispatch => ({
-    handleClick: (rowIndex, cellIndex) =>
-      dispatch(toggleCell(rowIndex, cellIndex))
-  })
+  state => pick(state, ['board', 'initial', 'isValid', 'time']),
+  {
+    handleClick: toggleCell,
+    handleValidate: validateBoard,
+    setTimer
+  }
 )
 
 class App extends Component {
-  state = {
-    time: 0
-  }
-
   componentDidMount() {
     this.timer = setInterval(() => {
-      this.setState(state => ({
-        time: state.time + 1
-      }))
+      if (this.props.isValid) {
+        clearInterval(this.timer)
+      } else {
+        this.props.setTimer()
+      }
     }, 1000)
   }
 
@@ -35,19 +31,8 @@ class App extends Component {
     clearInterval(this.timer)
   }
 
-  handleValidate = () => {
-    const isValid = validate(this.props.board)
-    if (isValid) {
-      clearInterval(this.timer)
-    }
-    this.setState({
-      text: isValid ? 'Board is valid!' : 'Board is invalid!'
-    })
-  }
-
   render() {
-    const { board, initial } = this.props
-    const { text, time } = this.state
+    const { board, initial, isValid, time } = this.props
     return (
       <div className="App">
         <div className="board">
@@ -63,8 +48,8 @@ class App extends Component {
           )}
         </div>
         <p>Time: {time} seconds</p>
-        {text && <p>{text}</p>}
-        <button onClick={this.handleValidate}>Validate</button>
+        <p>{isValid ? 'Board is valid!' : 'Board is invalid!'}</p>
+        <button onClick={this.props.handleValidate}>Validate</button>
       </div>
     )
   }
