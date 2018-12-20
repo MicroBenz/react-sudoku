@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import pick from 'lodash/pick'
-
-import './App.css'
+import styled, { createGlobalStyle } from 'styled-components'
 
 import Cell from './components/Cell'
 import {
@@ -11,6 +10,33 @@ import {
   setTimer,
   loadBoard
 } from './redux/reducers'
+
+const Container = styled.div`
+  width: 600px;
+  margin: 0 auto;
+  margin-top: 20px;
+  text-align: center;
+`
+
+const Button = styled.button`
+  padding: 15px;
+  border: 0;
+  background: #444;
+  color: #fff;
+  font-size: 25px;
+  border-radius: 5px;
+  margin-top: 10px;
+`
+
+const GlobalStyle = createGlobalStyle`
+  p {
+    text-align: center;
+    font-size: 30px;
+    margin-top: 20px;
+    display: inline-block;
+    width: 100%;
+  }
+`
 
 const enhance = connect(
   state =>
@@ -49,7 +75,7 @@ class App extends Component {
   render() {
     const { board, initial, isValid, time, boardLoading, isError } = this.props
     return (
-      <div className="App">
+      <Container>
         <div className="board">
           {isError ? (
             <p>Error Load Board</p>
@@ -72,8 +98,9 @@ class App extends Component {
         </div>
         <p>Time: {time} seconds</p>
         <p>{isValid ? 'Board is valid!' : 'Board is invalid!'}</p>
-        <button onClick={this.props.handleValidate}>Validate</button>
-      </div>
+        <Button onClick={this.props.handleValidate}>Validate</Button>
+        <GlobalStyle />
+      </Container>
     )
   }
 }
