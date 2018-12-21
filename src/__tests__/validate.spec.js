@@ -20,7 +20,7 @@ describe('Board Validation function', () => {
     {
       input: [[3, 4, 1, 2], [1, 2, 3, 4], [4, 3, 2, 1], [2, 1, 4, 3]],
       expect: true,
-      description: '#4 Failed board'
+      description: '#4 Passed board'
     }
   ]
   testCases.map(testCase =>
