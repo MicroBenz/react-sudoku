@@ -1,10 +1,12 @@
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
+import React, { useState, useEffect } from 'react'
 import pick from 'lodash/pick'
+import set from 'lodash/set'
 import styled, { createGlobalStyle } from 'styled-components'
+import axios from 'axios'
 
 import Cell from './components/Cell'
 import { toggleCell, validateBoard, setTimer, loadBoard } from './redux'
+import vallidate from '../../utils/vallidate'
 
 const Container = styled.div`
   width: 600px;
@@ -33,72 +35,127 @@ const GlobalStyle = createGlobalStyle`
   }
 `
 
-const enhance = connect(
-  state =>
-    pick(state, [
-      'board',
-      'initial',
-      'isValid',
-      'time',
-      'boardLoading',
-      'isError'
-    ]),
-  {
-    handleClick: toggleCell,
-    handleValidate: validateBoard,
-    setTimer,
-    loadBoard
-  }
-)
-
-class BoardPage extends Component {
-  componentDidMount() {
-    const level = parseInt(this.props.match.params.levelId)
-    this.props.loadBoard(level)
-    this.timer = setInterval(() => {
-      if (this.props.isValid) {
-        clearInterval(this.timer)
-      } else {
-        this.props.setTimer()
+const createUseTimer = () => {
+  let interval
+  let localTimer = 0
+  return () => {
+    const [timer, setTimer] = useState(0)
+    // console.log('use', localTimer)]
+    const stopTimer = () => (interval ? clearInterval(interval) : null)
+    useEffect(() => {
+      // let localTimer = 0
+      interval = setInterval(() => {
+        localTimer = localTimer + 1
+        setTimer(localTimer)
+      }, 1000)
+      return () => {
+        console.log('effect', interval)
+        stopTimer()
       }
-    }, 1000)
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.timer)
-  }
-
-  render() {
-    const { board, initial, isValid, time, boardLoading, isError } = this.props
-    return (
-      <Container>
-        <div className="board">
-          {isError ? (
-            <p>Error Load Board</p>
-          ) : boardLoading ? (
-            <p>Loading</p>
-          ) : (
-            board.map((row, rowIndex) =>
-              row.map((cell, cellIndex) => (
-                <Cell
-                  number={cell}
-                  key={`${rowIndex} - ${cellIndex}`}
-                  isInitial={initial[rowIndex][cellIndex]}
-                  handleClick={() =>
-                    this.props.handleClick(rowIndex, cellIndex)
-                  }
-                />
-              ))
-            )
-          )}
-        </div>
-        <p>Time: {time} seconds</p>
-        <p>{isValid ? 'Board is valid!' : 'Board is invalid!'}</p>
-        <Button onClick={this.props.handleValidate}>Validate</Button>
-        <GlobalStyle />
-      </Container>
-    )
+    }, [])
+    return [timer, stopTimer]
   }
 }
 
-export default enhance(BoardPage)
+const useTimer = createUseTimer()
+
+const levelMap = {
+  1: 'http://www.mocky.io/v2/5c1b2f393300005f007fd622',
+  2: 'http://www.mocky.io/v2/5c1c4bb43100005500103ff9'
+}
+
+const useBoard = (level, stopTimer) => {
+  const [board, setBoard] = useState({
+    board: [],
+    initial: [],
+    loading: true,
+    error: false,
+    isValid: false
+  })
+  useEffect(() => {
+    axios
+      .get(levelMap[level])
+      .then(resp => {
+        setBoard({
+          ...board,
+          board: resp.data.board,
+          initial: resp.data.initial,
+          loading: false
+        })
+      })
+      .catch(() => {
+        setBoard({
+          ...board,
+          error: true
+        })
+      })
+  }, [])
+  return [
+    board,
+    (rowIndex, cellIndex) => {
+      console.log(rowIndex, cellIndex, board)
+      setBoard({
+        ...board,
+        board: set(
+          board.board,
+          `${rowIndex}.${cellIndex}`,
+          (board.board[rowIndex][cellIndex] + 1) % 5
+        )
+      })
+    },
+    () => {
+      const isBoardValid = vallidate(board.board)
+      if (isBoardValid) {
+        stopTimer()
+      }
+      setBoard({
+        ...board,
+        isValid: isBoardValid
+      })
+    }
+  ]
+}
+
+const BoardPage = props => {
+  const [time, stopTimer] = useTimer()
+  const [board, toggleCell, validateBoard] = useBoard(
+    parseInt(props.match.params.levelId),
+    stopTimer
+  )
+  // useInitialBoard(
+  //   props.loadBoard,
+  //   parseInt(props.match.params.levelId),
+  //   data => {
+  //     boardActions.setBoardFromAPI(data.board, data.initial)
+  //   }
+  // )
+  console.log(board)
+  return (
+    <Container>
+      <div className="board">
+        {board.error ? (
+          <p>Error Load Board</p>
+        ) : board.loading ? (
+          <p>Loading</p>
+        ) : (
+          board.board.map((row, rowIndex) =>
+            row.map((cell, cellIndex) => (
+              <Cell
+                number={cell}
+                key={`${rowIndex} - ${cellIndex}`}
+                isInitial={board.initial[rowIndex][cellIndex]}
+                handleClick={() => toggleCell(rowIndex, cellIndex)}
+              />
+            ))
+          )
+        )}
+      </div>
+      <p>Time: {time} seconds</p>
+      <p>{board.isValid ? 'Board is valid!' : 'Board is invalid!'}</p>
+      <Button onClick={validateBoard}>Validate</Button>
+      <GlobalStyle />
+    </Container>
+  )
+}
+
+export default BoardPage
