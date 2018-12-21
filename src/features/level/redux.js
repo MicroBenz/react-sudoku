@@ -1,6 +1,6 @@
 import axios from 'axios'
 import set from 'lodash/set'
-import validate from '../utils/vallidate'
+import validate from '../../utils/vallidate'
 
 const initialState = {
   board: [],

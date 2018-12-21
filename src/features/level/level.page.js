@@ -3,13 +3,8 @@ import { connect } from 'react-redux'
 import pick from 'lodash/pick'
 import styled, { createGlobalStyle } from 'styled-components'
 
-import Cell from '../components/Cell'
-import {
-  toggleCell,
-  validateBoard,
-  setTimer,
-  loadBoard
-} from '../redux/reducers'
+import Cell from './components/Cell'
+import { toggleCell, validateBoard, setTimer, loadBoard } from './redux'
 
 const Container = styled.div`
   width: 600px;
