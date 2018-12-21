@@ -59,7 +59,6 @@ const enhance = connect(
 class BoardPage extends Component {
   componentDidMount() {
     const level = parseInt(this.props.match.params.levelId)
-    console.log(level)
     this.props.loadBoard(level)
     this.timer = setInterval(() => {
       if (this.props.isValid) {
