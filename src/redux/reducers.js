@@ -61,9 +61,9 @@ export default (state = initialState, action) => {
   }
 }
 
-export const loadBoard = () => ({
+export const loadBoard = levelId => ({
   type: 'LOAD_BOARD',
-  payload: axios.get('http://www.mocky.io/v2/5c1b2f393300005f007fd622')
+  payload: axios.get(`http://www.mocky.io/v2/${levelId}`)
 })
 
 export const toggleCell = (rowIndex, cellIndex) => ({

@@ -58,7 +58,8 @@ const enhance = connect(
 
 class BoardPage extends Component {
   componentDidMount() {
-    this.props.loadBoard()
+    const { levelId } = this.props.match.params
+    this.props.loadBoard(levelId)
     this.timer = setInterval(() => {
       if (this.props.isValid) {
         clearInterval(this.timer)
