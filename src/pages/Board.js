@@ -3,13 +3,13 @@ import { connect } from 'react-redux'
 import pick from 'lodash/pick'
 import styled, { createGlobalStyle } from 'styled-components'
 
-import Cell from './components/Cell'
+import Cell from '../components/Cell'
 import {
   toggleCell,
   validateBoard,
   setTimer,
   loadBoard
-} from './redux/reducers'
+} from '../redux/reducers'
 
 const Container = styled.div`
   width: 600px;
@@ -56,7 +56,7 @@ const enhance = connect(
   }
 )
 
-class App extends Component {
+class BoardPage extends Component {
   componentDidMount() {
     this.props.loadBoard()
     this.timer = setInterval(() => {
@@ -105,4 +105,4 @@ class App extends Component {
   }
 }
 
-export default enhance(App)
+export default enhance(BoardPage)
