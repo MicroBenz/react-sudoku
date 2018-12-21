@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import pick from 'lodash/pick'
 import set from 'lodash/set'
 import styled, { createGlobalStyle } from 'styled-components'
 import axios from 'axios'
 
 import Cell from './components/Cell'
-import { toggleCell, validateBoard, setTimer, loadBoard } from './redux'
 import vallidate from '../../utils/vallidate'
 
 const Container = styled.div`
@@ -122,14 +120,6 @@ const BoardPage = props => {
     parseInt(props.match.params.levelId),
     stopTimer
   )
-  // useInitialBoard(
-  //   props.loadBoard,
-  //   parseInt(props.match.params.levelId),
-  //   data => {
-  //     boardActions.setBoardFromAPI(data.board, data.initial)
-  //   }
-  // )
-  console.log(board)
   return (
     <Container>
       <div className="board">
