@@ -1,4 +1,4 @@
-import boardValidate from '../utils/vallidate'
+import boardValidate from './vallidate'
 
 describe('Board Validation function', () => {
   const testCases = [
