@@ -11,6 +11,10 @@ const initialState = {
   time: 0
 }
 
+const levelMap = {
+  1: 'http://www.mocky.io/v2/5c1b2f393300005f007fd622',
+  2: 'http://www.mocky.io/v2/5c1c4bb43100005500103ff9'
+}
 export default (state = initialState, action) => {
   switch (action.type) {
     case 'LOAD_BOARD_PENDING':
@@ -61,9 +65,9 @@ export default (state = initialState, action) => {
   }
 }
 
-export const loadBoard = levelId => ({
+export const loadBoard = level => ({
   type: 'LOAD_BOARD',
-  payload: axios.get(`http://www.mocky.io/v2/${levelId}`)
+  payload: axios.get(levelMap[level])
 })
 
 export const toggleCell = (rowIndex, cellIndex) => ({
